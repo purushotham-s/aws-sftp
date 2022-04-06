@@ -6,6 +6,8 @@ import getpass
 import crypt
 import boto3
 
+aws_client = boto3.client('apigateway', region_name = 'us-east-1')
+
 def add_sftp_user(username, password, sftp_group='sftp-upload'):
     try:
         subprocess.run(['sudo', 'useradd', '-p', password, '-G', sftp_group, username ])
@@ -39,7 +41,6 @@ def generate_api_key(username, api_id, apiusage_plan_id):
 
 def main():
     try:
-        aws_client = boto3.client('apigateway', region_name = 'us-east-1')
         username = input("Enter SFTP Username: ")
         ppassword = getpass.getpass()
         password = crypt.crypt(ppassword, "22")
