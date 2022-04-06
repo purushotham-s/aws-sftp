@@ -2,7 +2,6 @@
 """Script to create SFTP users with API Key"""
 import os
 import subprocess
-import sys
 import getpass
 import crypt
 import boto3
