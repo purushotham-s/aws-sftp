@@ -10,13 +10,12 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('sftp_table')
 
 def lambda_handler(event, context):
+    """Fetches uploaded file and checks if there is 20 characters in 2nd 
+    line of the file and extracts the characters and pushes the extracted
+    contents to a dynamodb table. Files are deleted regardless whether they
+    have content or not
+    """
     try:
-        """Fetches uploaded file and checks if there is 20 characters in 2nd 
-        line of the file and extracts the characters and pushes the extracted
-        contents to a dynamodb table. Files are deleted regardless whether they
-        have content or not
-         """
-         
         bucket_name = event['Records'][0]['s3']['bucket']['name']
         s3_file_name = event['Records'][0]['s3']['object']['key']
         response = s3.get_object(Bucket=bucket_name, Key=s3_file_name)

@@ -53,6 +53,20 @@ resource "aws_iam_policy" "sftp_bucket_access_policy" {
         ],
         Effect   = "Allow"
         Resource = "arn:aws:s3:::${var.sftp_bucket}/*"
+      },
+      {
+        Action = [
+          "apigateway:GET",
+          "apigateway:POST",
+          "apigateway:PUT"
+        ],
+        Effect = "Allow"
+        Resource = [ 
+          "arn:aws:apigateway:*::/restapis",
+          "arn:aws:apigateway:*::/usageplans",
+          "arn:aws:apigateway:*::/usageplans/*",
+          "arn:aws:apigateway:*::/apikeys"
+        ]
       }
     ]
   })
