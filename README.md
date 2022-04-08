@@ -21,5 +21,7 @@ Lambda, API Gateway, Dynamodb resources.
 * Initialize terraform by running - `$ terraform init`
 * Create the setup by running - `$ terraform apply` # Make sure to properly examine the terraform plan before applying it.
 * After the terraform state is applied successfully a SSH key to the EC2 instance will be created on the working directory. It can be used to login to the SFTP EC2 instance, before logging-in we will have to change the permission of the ssh key by running - `$ chmod 400 sftp-key.pem`
-* Once logged into the SFTP instance, we can create sftp users and API Keys by running - `$ manage-sftp-users`, the script will prompt for username and password for the new sftp user and provides a API key after the user is created.
+* Once logged into the SFTP instance, we can create sftp users and API Keys by running - `$ manage-sftp-users`, the script will prompt for username and password for the new sftp user, provides a API key and the API URL after the user is created.
 * To upload files to the sftp server, run - `$ sftp sftp-user1@<instance-ip>` and once logged in, run `$ put <file_name> incoming/`.
+* To query the API run - `$ curl -X GET https:<API_URL>?file_name=<uploaded_filename> -H "x-api-key: <API_KEY>"`
+

@@ -83,9 +83,9 @@ resource "aws_lambda_permission" "allow_bucket_exec" {
 }
 
 data "archive_file" "process_s3_lambda_zip" {
-    type        = "zip"
-    source_file  = "${path.module}/process-s3-uploads.py"
-    output_path = "${path.module}/process-s3-uploads.zip"
+  type        = "zip"
+  source_file = "${path.module}/process-s3-uploads.py"
+  output_path = "${path.module}/process-s3-uploads.zip"
 }
 
 resource "aws_lambda_function" "proccess_s3_uploads" {
@@ -95,14 +95,14 @@ resource "aws_lambda_function" "proccess_s3_uploads" {
   handler          = "process-s3-uploads.lambda_handler"
   filename         = "${path.module}/process-s3-uploads.zip"
   timeout          = 15
-  source_code_hash = "${data.archive_file.process_s3_lambda_zip.output_base64sha256}"
+  source_code_hash = data.archive_file.process_s3_lambda_zip.output_base64sha256
 }
 
 resource "aws_s3_bucket_notification" "s3_process_lambda_trigger" {
   bucket = aws_s3_bucket.sftp_bucket.id
   lambda_function {
     lambda_function_arn = aws_lambda_function.proccess_s3_uploads.arn
-    events = ["s3:ObjectCreated:*"]
+    events              = ["s3:ObjectCreated:*"]
   }
   depends_on = [aws_lambda_permission.allow_bucket_exec]
 }

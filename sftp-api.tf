@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "sftp_api" {
-  name        = "sftp_api"
+  name = "sftp_api"
   depends_on = [
     aws_lambda_function.query_sftp_db
   ]
@@ -46,9 +46,9 @@ resource "aws_iam_role_policy_attachment" "sftp_query_lambda_policy_attach" {
 }
 
 data "archive_file" "query_sftp_lambda_zip" {
-    type        = "zip"
-    source_file  = "${path.module}/query-sftp-db.py"
-    output_path = "${path.module}/query-sftp-db.zip"
+  type        = "zip"
+  source_file = "${path.module}/query-sftp-db.py"
+  output_path = "${path.module}/query-sftp-db.zip"
 }
 
 resource "aws_lambda_function" "query_sftp_db" {
@@ -58,7 +58,7 @@ resource "aws_lambda_function" "query_sftp_db" {
   handler          = "query-sftp-db.lambda_handler"
   filename         = "query-sftp-db.zip"
   timeout          = 15
-  source_code_hash = "${data.archive_file.query_sftp_lambda_zip.output_base64sha256}"
+  source_code_hash = data.archive_file.query_sftp_lambda_zip.output_base64sha256
 }
 
 resource "aws_api_gateway_resource" "sftp_api_gw" {
@@ -68,8 +68,8 @@ resource "aws_api_gateway_resource" "sftp_api_gw" {
 }
 
 resource "aws_api_gateway_stage" "dev_stage" {
-  stage_name = "dev"
-  rest_api_id = aws_api_gateway_rest_api.sftp_api.id
+  stage_name    = "dev"
+  rest_api_id   = aws_api_gateway_rest_api.sftp_api.id
   deployment_id = aws_api_gateway_deployment.sftp_api_gw_get.id
 }
 
@@ -77,13 +77,13 @@ resource "aws_api_gateway_usage_plan" "apigw_usage_plan" {
   name = "apigw_usage_plan"
   api_stages {
     api_id = aws_api_gateway_rest_api.sftp_api.id
-    stage = aws_api_gateway_stage.dev_stage.stage_name
+    stage  = aws_api_gateway_stage.dev_stage.stage_name
   }
 }
 
 resource "aws_api_gateway_usage_plan_key" "apigw_usage_plan_key" {
-  key_id = aws_api_gateway_api_key.apigw_dev_key.id
-  key_type = "API_KEY"
+  key_id        = aws_api_gateway_api_key.apigw_dev_key.id
+  key_type      = "API_KEY"
   usage_plan_id = aws_api_gateway_usage_plan.apigw_usage_plan.id
 }
 
@@ -92,10 +92,10 @@ resource "aws_api_gateway_api_key" "apigw_dev_key" {
 }
 
 resource "aws_api_gateway_method" "query_sftp_get" {
-  rest_api_id   = aws_api_gateway_rest_api.sftp_api.id
-  resource_id   = aws_api_gateway_resource.sftp_api_gw.id
-  http_method   = "GET"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.sftp_api.id
+  resource_id      = aws_api_gateway_resource.sftp_api_gw.id
+  http_method      = "GET"
+  authorization    = "NONE"
   api_key_required = true
 }
 
@@ -104,22 +104,22 @@ resource "aws_lambda_permission" "apigw" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.query_sftp_db.arn
   principal     = "apigateway.amazonaws.com"
-  source_arn = "${aws_api_gateway_rest_api.sftp_api.execution_arn}/*/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.sftp_api.execution_arn}/*/*/*"
 }
 
 resource "aws_api_gateway_integration" "lambda_integration_get" {
   depends_on = [
     aws_lambda_permission.apigw
   ]
-  rest_api_id = aws_api_gateway_rest_api.sftp_api.id
-  resource_id = aws_api_gateway_method.query_sftp_get.resource_id
-  http_method = aws_api_gateway_method.query_sftp_get.http_method
+  rest_api_id             = aws_api_gateway_rest_api.sftp_api.id
+  resource_id             = aws_api_gateway_method.query_sftp_get.resource_id
+  http_method             = aws_api_gateway_method.query_sftp_get.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.query_sftp_db.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "sftp_api_gw_get" {
-  depends_on = [aws_api_gateway_integration.lambda_integration_get,  aws_api_gateway_method.query_sftp_get]
+  depends_on  = [aws_api_gateway_integration.lambda_integration_get, aws_api_gateway_method.query_sftp_get]
   rest_api_id = aws_api_gateway_rest_api.sftp_api.id
 }

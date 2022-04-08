@@ -46,6 +46,8 @@ def main():
         password = crypt.crypt(ppassword, "22")
         add_sftp_user(username, password)
         rest_apis = aws_client.get_rest_apis()['items']
+        method_path = '/dev/sftp-data'
+        base_url = 'execute-api.us-east-1.amazonaws.com'
 
         for rest_api in rest_apis:
             if rest_api['name'] == 'sftp_api':
@@ -58,6 +60,7 @@ def main():
                 apiusage_plan_id = usage_plan['id']
 
         generate_api_key(username, api_id, apiusage_plan_id)
+        print(f"API URL: https://{api_id}.{base_url}{method_path}")
     except Exception as error:
         print(error)
 
