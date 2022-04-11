@@ -21,7 +21,7 @@ amazon-linux-extras install epel
 yum install s3fs-fuse awscli -y
 
 # Adding /etc/fstab entry to keep the mount persistent
-echo -e "sftp-srv-bucket-1\t/opt/sftp/incoming\tfuse.s3fs\t_netdev,allow_other,use_path_request_style,iam_role=ec2_s3_access_role,url=https://s3.us-east-1.amazonaws.com/\t0\t0" >> /etc/fstab
+echo -e "${sftp_s3_bucket}\t/opt/sftp/incoming\tfuse.s3fs\t_netdev,allow_other,use_path_request_style,iam_role=ec2_s3_access_role,url=https://s3.us-east-1.amazonaws.com/\t0\t0" >> /etc/fstab
 mount -a
 
 # Fetches script to manage SFTP users and API Keys

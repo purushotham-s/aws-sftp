@@ -45,7 +45,7 @@ resource "aws_iam_policy" "s3_process_lambda_access_policy" {
           "s3:ListBucket",
         ],
         Effect   = "Allow",
-        Resource = "arn:aws:s3:::${var.sftp_bucket}"
+        Resource = "arn:aws:s3:::${aws_s3_bucket.sftp_bucket.id}"
       },
       {
         Action = [
@@ -54,7 +54,7 @@ resource "aws_iam_policy" "s3_process_lambda_access_policy" {
           "s3:DeleteObject",
         ],
         Effect   = "Allow"
-        Resource = "arn:aws:s3:::${var.sftp_bucket}/*"
+        Resource = "arn:aws:s3:::${aws_s3_bucket.sftp_bucket.id}/*"
       },
       {
         Action = [

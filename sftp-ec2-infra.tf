@@ -1,6 +1,6 @@
 
 resource "aws_s3_bucket" "sftp_bucket" {
-  bucket = var.sftp_bucket
+  bucket_prefix = "sftp-s3-bucket-"
 }
 
 resource "aws_s3_bucket_acl" "sftp_bucket" {
@@ -43,7 +43,7 @@ resource "aws_iam_policy" "sftp_bucket_access_policy" {
           "s3:ListBucket",
         ],
         Effect   = "Allow",
-        Resource = "arn:aws:s3:::${var.sftp_bucket}"
+        Resource = "arn:aws:s3:::${aws_s3_bucket.sftp_bucket.id}"
       },
       {
         Action = [
@@ -52,7 +52,7 @@ resource "aws_iam_policy" "sftp_bucket_access_policy" {
           "s3:DeleteObject",
         ],
         Effect   = "Allow"
-        Resource = "arn:aws:s3:::${var.sftp_bucket}/*"
+        Resource = "arn:aws:s3:::${aws_s3_bucket.sftp_bucket.id}/*"
       },
       {
         Action = [
@@ -61,7 +61,7 @@ resource "aws_iam_policy" "sftp_bucket_access_policy" {
           "apigateway:PUT"
         ],
         Effect = "Allow"
-        Resource = [ 
+        Resource = [
           "arn:aws:apigateway:*::/restapis",
           "arn:aws:apigateway:*::/usageplans",
           "arn:aws:apigateway:*::/usageplans/*",
@@ -112,11 +112,18 @@ resource "aws_security_group" "ssh-sg" {
   }
 }
 
+data "template_file" "ec2_init_script" {
+  template = file("init-script.sh")
+  vars = {
+    sftp_s3_bucket = aws_s3_bucket.sftp_bucket.id
+  }
+}
+
 resource "aws_instance" "sftp_ec2_instance" {
   ami                    = var.amz-linux-ami-id
   instance_type          = "t2.micro"
   key_name               = "sftp-key"
   vpc_security_group_ids = [aws_security_group.ssh-sg.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_s3_profile.name
-  user_data              = file("init-script.sh")
+  user_data_base64       = base64encode(data.template_file.ec2_init_script.rendered)
 }
