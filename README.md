@@ -18,7 +18,7 @@ service can be configured instead of using PAM authentication and then managed f
 * Initialize your aws credentials by running: `$ aws configure`
 * Install terraform by following the instructions on - https://learn.hashicorp.com/tutorials/terraform/install-cli
 * Clone this git repository by running - `$ git clone https://github.com/purushotham-s/aws-sftp.git`
-* Traverse into the aws-sftp directory - `$ cd aws-ftp`
+* Traverse into the aws-sftp directory - `$ cd aws-sftp`
 * Initialize terraform by running - `$ terraform init`
 * Create the setup by running - `$ terraform apply` # Make sure to properly examine the terraform plan before applying it.
 * After the terraform state is applied successfully a SSH key to the EC2 instance will be created on the working directory. It can be used to login to the SFTP EC2 instance, before logging-in we will have to change the permission of the ssh key by running - `$ chmod 400 sftp-key.pem`
